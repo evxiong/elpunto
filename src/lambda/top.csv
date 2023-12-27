@@ -1,0 +1,24 @@
+Source,Feed
+ABC News,https://abcnews.go.com/abcnews/topstories
+Axios,https://api.axios.com/feed/
+BBC News,http://feeds.bbci.co.uk/news/rss.xml?edition=us
+CBS News,https://www.cbsnews.com/latest/rss/main
+CNN,http://rss.cnn.com/rss/cnn_latest.rss
+The Guardian,https://www.theguardian.com/us/rss
+The Hill,https://thehill.com/homenews/feed/
+NBC News,https://feeds.nbcnews.com/nbcnews/public/news
+The New York Times,https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+NPR,https://feeds.npr.org/1001/rss.xml
+PBS Newshour,https://www.pbs.org/newshour/feeds/rss/headlines
+Politico,https://www.politico.com/rss/politicopicks.xml
+r/news,https://www.reddit.com/r/news/top.rss
+Reuters,https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com&ceid=US:en&hl=en-US&gl=US
+Time,https://time.com/feed/
+Vox,https://www.vox.com/rss/index.xml
+The Washington Post,https://feeds.washingtonpost.com/rss/homepage
+The Athletic,https://theathletic.com/feeds/rss/news/
+ESPN,https://www.espn.com/espn/rss/news
+CNBC,https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114
+Financial Times,https://www.ft.com/rss/home/international
+Al Jazeera,https://www.aljazeera.com/xml/rss/all.xml
+Deutsche Welle,https://rss.dw.com/rdf/rss-en-world
