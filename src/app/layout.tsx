@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${space_grotesk.variable} ${manrope.variable}`}>
-      <body className="mx-auto max-w-screen-2xl px-6 sm:px-10">
+      <body className="mx-auto max-w-screen-2xl px-4 sm:px-10">
         <Navbar />
         {children}
       </body>
