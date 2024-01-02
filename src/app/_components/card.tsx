@@ -150,6 +150,7 @@ function Article({ info }: { info: ArticleInfo }) {
     >
       <img
         src={ICONS[info.source]}
+        alt={info.source + " icon"}
         className="w-5 h-5 rounded-sm border border-gray-200 dark:border-gray-700 self-start mt-[2px]"
       />
       <div className="flex tracking-normal flex-col leading-4 gap-0.5 dark:text-gray-300">
