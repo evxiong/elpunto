@@ -3,15 +3,15 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocal from "dayjs/plugin/updateLocale";
 
 const CATEGORIES = {
-  "U.S.": "text-red",
-  World: "text-world",
-  Politics: "text-politics",
-  Business: "text-business",
-  Tech: "text-tech",
-  Sports: "text-sports",
-  Entertainment: "text-entertainment",
-  Science: "text-science",
-  Health: "text-health",
+  "U.S.": "text-us bg-us",
+  World: "text-world bg-world",
+  Politics: "text-politics bg-politics",
+  Business: "text-business bg-business",
+  Tech: "text-tech bg-tech",
+  Sports: "text-sports bg-sports",
+  Entertainment: "text-entertainment bg-entertainment",
+  Science: "text-science bg-science",
+  Health: "text-health bg-health",
 } as const;
 
 const ICONS = {
@@ -102,7 +102,7 @@ function HeadlineCard({ headline }: { headline: Headline }) {
         <span
           className={`${
             CATEGORIES[headline.category]
-          } font-medium dark:bg-gray-400 dark:bg-opacity-10 dark:py-0.5 dark:px-1.5 dark:rounded-full`}
+          } font-medium bg-opacity-10 py-0.5 px-1.5 rounded-full`}
         >
           {headline.category}
         </span>{" "}
