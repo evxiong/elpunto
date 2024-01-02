@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import Logo from "./logo";
 
 export default function Navbar() {
   const [curDate, setCurDate] = useState<string>();
@@ -31,74 +31,70 @@ export default function Navbar() {
   }, []);
 
   return (
-    <div className="relative flex flex-row select-none justify-center items-center py-8">
-      {/* <div className="hidden sm:flex absolute left-0 font-manrope font-medium text-sm text-gray-500">
-        {curDate}
-      </div> */}
-      <div className="flex flex-row items-center gap-6 sm:flex absolute left-0 font-manrope font-medium text-sm">
-        {/* <Link href="/about">
+    <>
+      <div className="relative flex flex-row select-none justify-center items-center py-6 sm:py-8">
+        <div className="flex flex-row items-center gap-6 sm:flex absolute left-0 font-manrope font-medium text-sm">
+          <div className="hidden sm:flex font-manrope font-medium text-[13px] text-neutral-500 dark:text-gray-400">
+            {curDate && <span>{curDate}</span>}
+            {curTemp && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</span>}
+          </div>
+        </div>
+        <Logo />
+        <a
+          href="https://github.com/evxiong/elpunto"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="hidden sm:flex hover:cursor-pointer hover:decoration-neutral-200 dark:hover:decoration-gray-700 decoration-neutral-500 dark:decoration-gray-400 underline underline-offset-4 absolute items-center right-0 font-manrope font-medium text-[13px] text-neutral-500"
+        >
+          <span className="underline-offset-2 cursor-pointer mr-0.5 dark:text-gray-400">
+            View on GitHub
+          </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            className="w-7 h-7 sm:w-5 sm:h-5 stroke-gray-500 hover:opacity-75"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-            />
-          </svg>
-        </Link> */}
-
-        {/* <button className="text-black">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
+            viewBox="0 0 16 16"
+            className="w-4 h-4 fill-neutral-500 dark:fill-gray-400"
           >
             <path
               fillRule="evenodd"
-              d="M3 9a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 9Zm0 6.75a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z"
+              d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z"
               clipRule="evenodd"
             />
           </svg>
-        </button> */}
-        <div className="hidden sm:flex font-manrope font-medium text-[13px] text-gray-500">
-          {curDate && <span>{curDate}</span>}
-          {curTemp && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</span>}
-        </div>
+        </a>
       </div>
-      <Link href="/" className="flex flex-row items-center gap-3">
-        <div className="w-[10px] h-[10px] bg-green rounded-xl"></div>
-        <div className="font-space font-medium text-lg tracking-tight">
-          El Punto
+
+      {/* Mobile navbar */}
+      <div className="select-none sm:hidden border font-manrope text-sm font-medium text-neutral-700 border-gray-200 dark:border-gray-700 rounded-md mb-4 p-4 flex flex-row gap-2 justify-between">
+        <div className="sm:hidden font-manrope font-medium text-[13px] text-neutral-500 dark:text-gray-400 line-clamp-1">
+          {curDate && (
+            <span>
+              {curDate}
+              {curTemp && <>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</>}
+            </span>
+          )}
         </div>
-      </Link>
-      {/* <div className="hidden sm:flex absolute right-0 font-manrope font-medium text-[13px] text-gray-500">
-        {curDate && <span>{curDate}</span>}
-        {curTemp && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</span>}
-      </div> */}
-      <div className="flex absolute items-center right-0 font-manrope font-medium text-[13px] text-gray-500">
-        <button>
+        <a
+          href="https://github.com/evxiong/elpunto"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="flex-shrink-0 hover:cursor-pointer hover:decoration-neutral-200 dark:hover:decoration-gray-700 decoration-neutral-500 dark:decoration-gray-400 underline underline-offset-4 flex items-center font-manrope font-medium text-[13px] text-neutral-500"
+        >
+          <span className="underline-offset-2 cursor-pointer mr-0.5 dark:text-gray-400">
+            View on GitHub
+          </span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-7 h-7 sm:hidden fill-none"
+            viewBox="0 0 16 16"
+            className="w-4 h-4 fill-neutral-500 dark:fill-gray-400"
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              fillRule="evenodd"
+              d="M4.22 11.78a.75.75 0 0 1 0-1.06L9.44 5.5H5.75a.75.75 0 0 1 0-1.5h5.5a.75.75 0 0 1 .75.75v5.5a.75.75 0 0 1-1.5 0V6.56l-5.22 5.22a.75.75 0 0 1-1.06 0Z"
+              clipRule="evenodd"
             />
           </svg>
-        </button>
-        <button className="hidden sm:flex">Sign In</button>
+        </a>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Navbar from "@/app/_components/navbar";
 import { Space_Grotesk, Manrope } from "next/font/google";
+import { Providers } from "./providers";
 
 const space_grotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -18,8 +18,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "El Punto",
-  description: "Breaking news, aggregated",
+  title: "El Punto - News, simplified.",
+  description: "News, simplified.",
 };
 
 export default function RootLayout({
@@ -29,9 +29,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${space_grotesk.variable} ${manrope.variable}`}>
-      <body className="mx-auto max-w-screen-2xl px-4 sm:px-10">
-        <Navbar />
-        {children}
+      <body className="mx-auto max-w-screen-2xl px-4 sm:px-10 dark:bg-gray-800 dark:text-white">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

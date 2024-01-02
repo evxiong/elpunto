@@ -1,5 +1,6 @@
 import Card from "@/app/_components/card";
 import { getTop } from "./_utils/db";
+import Navbar from "@/app/_components/navbar";
 
 const LAMBDA_EARLY = 13; // Time 1 (UTC) that Lambda runs
 const LAMBDA_LATE = 21; // Time 2 (UTC) that Lambda runs
@@ -26,8 +27,11 @@ export default async function Home() {
   const headlines = await getTop(getKey());
 
   return (
-    <main className="mb-10">
-      <Card headlines={headlines} />
-    </main>
+    <>
+      <Navbar />
+      <main className="mb-10">
+        <Card headlines={headlines} />
+      </main>
+    </>
   );
 }
