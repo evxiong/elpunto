@@ -19,15 +19,16 @@ const ICONS = {
   Axios: "https://www.axios.com/images/a_favicon-32.png",
   "BBC News": "https://www.bbc.com/bbcx/favicon-32x32.png",
   "CBS News":
-    "https://www.cbsnews.com/fly/bundles/cbsnewscore/icons/icon-32x32.png",
+    "https://www.cbsnews.com/fly/bundles/cbsnewscore/icons/icon-192x192.png",
   CNN: "https://www.cnn.com/media/sites/cnn/favicon.ico",
-  "The Guardian": "https://static.guim.co.uk/images/favicon-32x32.ico",
+  "The Guardian":
+    "https://assets.guim.co.uk/static/frontend/icons/homescreen/apple-touch-icon-120.png",
   "The Hill":
     "https://thehill.com/wp-content/uploads/sites/2/2023/03/cropped-favicon-512px-1.png?w=32",
   "NBC News":
     "https://nodeassets.nbcnews.com/cdnassets/projects/ramen/favicon/nbcnews/all-other-sizes-PNG.ico/favicon-32x32.png",
   "The New York Times":
-    "https://www.nytimes.com/vi-assets/static-assets/favicon-d2483f10ef688e6f89e23806b9700298.ico",
+    "https://www.nytimes.com/vi-assets/static-assets/apple-touch-icon-28865b72953380a40aa43318108876cb.png",
   NPR: "https://media.npr.org/chrome/favicon/favicon-32x32.png",
   "PBS Newshour":
     "https://d3i6fh83elv35t.cloudfront.net/static/assets/images/favicon/favicon-32x32.png",
@@ -36,15 +37,15 @@ const ICONS = {
     "https://styles.redditmedia.com/t5_2qh3l/styles/communityIcon_fmygcobc22z81.png",
   Reuters:
     "https://www.reuters.com/pf/resources/images/reuters/favicon/tr_fvcn_kinesis_32x32.ico?d=168",
-  Time: "https://time.com/favicon.ico",
+  Time: "https://time.com/img/favicons/favicon-32.png",
   Vox: "https://cdn.vox-cdn.com/community_logos/52517/voxv.png",
-  "The Washington Post": "https://www.washingtonpost.com/touch-icon-iphone.png",
+  "The Washington Post": "https://www.washingtonpost.com/favicon.ico",
   "The Athletic":
-    "https://theathletic.com/static/img/transparent-background-dark-favicon-32x32.png",
-  ESPN: "https://a.espncdn.com/favicon.ico",
+    "https://theathletic.com/static/img/cropped-cropped-favicon1-180x180.png",
+  ESPN: "https://a.espncdn.com/wireless/mw5/r1/images/bookmark-icons-v2/espn-icon-72x72.png",
   CNBC: "https://sc.cnbcfm.com/applications/cnbc.com/staticcontent/img/favicon.ico",
   "Financial Times":
-    "https://www.ft.com/__origami/service/image/v2/images/raw/ftlogo-v1%3Abrand-ft-logo-square-coloured?source=update-logos&format=png&width=32&height=32",
+    "https://www.ft.com/__origami/service/image/v2/images/raw/ftlogo-v1%3Abrand-ft-logo-square-coloured?source=update-logos&format=png&width=64&height=64",
   "Al Jazeera": "https://www.aljazeera.com/favicon_aje.ico",
   "Deutsche Welle": "https://www.dw.com/images/icons/favicon-32x32.png",
 } as const;
@@ -98,7 +99,11 @@ function HeadlineCard({ headline }: { headline: Headline }) {
   return (
     <div className="border border-gray-200 dark:border-gray-700 w-full rounded-md p-4 pb-6">
       <h2 className="font-space text-xs font-normal text-gray-700 dark:text-gray-400 mb-2">
-        <span className={`${CATEGORIES[headline.category]} font-medium dark:bg-gray-400 dark:bg-opacity-10 dark:py-0.5 dark:px-1.5 dark:rounded-full`}>
+        <span
+          className={`${
+            CATEGORIES[headline.category]
+          } font-medium dark:bg-gray-400 dark:bg-opacity-10 dark:py-0.5 dark:px-1.5 dark:rounded-full`}
+        >
           {headline.category}
         </span>{" "}
         · {headline.topic.charAt(0).toUpperCase() + headline.topic.slice(1)}
@@ -151,7 +156,7 @@ function Article({ info }: { info: ArticleInfo }) {
       <img
         src={ICONS[info.source]}
         alt={info.source + " icon"}
-        className="w-5 h-5 rounded-sm border border-gray-200 dark:border-gray-700 self-start mt-[2px]"
+        className="pointer-events-none w-5 h-5 rounded-sm border border-gray-200 dark:border-gray-700 self-start mt-[2px]"
       />
       <div className="flex tracking-normal flex-col leading-4 gap-0.5 dark:text-gray-300">
         {info.title}
