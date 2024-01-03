@@ -98,7 +98,7 @@ export default function Card({ headlines }: { headlines: Headline[] }) {
 function HeadlineCard({ headline }: { headline: Headline }) {
   return (
     <div className="border border-gray-200 dark:border-gray-700 w-full rounded-md p-4 pb-6">
-      <h2 className="font-space text-xs font-normal text-gray-700 dark:text-gray-400 mb-2">
+      <h2 className="font-space text-xs font-normal line-clamp-1 text-gray-700 dark:text-gray-400 mb-2">
         <span
           className={`${
             CATEGORIES[headline.category]
