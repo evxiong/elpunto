@@ -246,10 +246,10 @@ def gpt_request(repr_docs_map, ranked_topics, topic_model):
         separators=(",", ":"),
     )
 
-    prompt = """You are a news aggregator service. Here's a list of news headline clusters. Each sublist contains a small but representative subset of all headlines in the same cluster: %s. For each sublist, perform exactly the following steps (treat each sublist independently):
-1. Based on the headlines, classify each cluster as belonging to one of the following categories: U.S., World, Politics, Business, Tech, Sports, Entertainment, Science, Health. If it belongs to multiple categories, choose the more specific one.
-2. Use the headlines to generate a summary news headline for each cluster in the style of The New York Times (max 10 words).
-3. The clusters are described by the following keywords: %s. Based on the keywords and headlines, determine the news story/topic that each cluster is about (max 4 words).
+    prompt = """You are a news aggregator service. Here's a list of news headline clusters. Each sublist contains a small but representative subset of all headlines in the same cluster: %s. For each sublist, perform exactly the following steps (treat each cluster independently):
+1. Based on the headlines, classify the cluster as belonging to one of the following categories: U.S., World, Politics, Business, Tech, Sports, Entertainment, Science, Health. If it belongs to multiple categories, choose the more specific one.
+2. Use the headlines to generate a summary news headline for the cluster in the style of The New York Times (max 10 words).
+The clusters are described by the following keywords: %s. Based on the keywords and headlines, determine the news story that each cluster is about (ex. "Russia-Ukraine War").
 Answer with an array of JSON objects in a single line without whitespaces: [{"category":<category>,"topic":<topic>,"summary":<summary>},...]""" % (
         prompt_titles,
         prompt_keywords,
@@ -258,6 +258,7 @@ Answer with an array of JSON objects in a single line without whitespaces: [{"ca
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo-1106",
         max_tokens=2000,
+        temperature=0.5,
         messages=[
             {
                 "role": "user",
@@ -329,37 +330,6 @@ def main():
         gpt_responses, repr_articles_map, ranked_topics
     )
     perform_transaction(transact_items)
-
-    # try:
-    #     table.put_item(
-    #         ConditionExpression="attribute_not_exists(PK)",
-    #         Item={
-    #             "PK": "Top#" + pk_timestamp,
-    #             "SK": "0",
-    #             "expireAt": ttl_expire,
-    #             "category": "Politics",
-    #             "summary": "Maine Secretary of State Faces Impeachment Threat After Blocking Trump from Presidential Primary Ballot",
-    #             "topic": "Trump 2024 Ballot Disqualification",
-    #             "articles": [
-    #                 {
-    #                     "link": "https://www.axios.com/2023/12/28/colorado-supreme-court-trump-republican-party",
-    #                     "pubDate": "2023-12-28 01:51:58+00:00",
-    #                     "source": "Axios",
-    #                     "title": "Keep Trump on 2024 ballot, Colorado Republican Party urges U.S. Supreme Court in petition",
-    #                 },
-    #                 {
-    #                     "link": "https://www.cbsnews.com/news/colorado-republican-party-appeal-u-s-supreme-court-trump-ballot-ban/",
-    #                     "pubDate": "2023-12-28 09:50:00+00:00",
-    #                     "source": "CBS News",
-    #                     "title": "Colorado Republican Party appeals Trump ballot ban to U.S. Supreme Court",
-    #                 },
-    #             ],
-    #         },
-    #     )
-    # except Exception as exception:
-    #     print("Exception raised: " + exception.__class__.__name__)
-    # else:
-    #     print("Successfully wrote items with PK: " + "Top#" + pk_timestamp)
 
 
 if __name__ == "__main__":
