@@ -24,5 +24,5 @@ export const getTop = unstable_cache(
     return res;
   },
   ["headlines"],
-  { revalidate: 3600 }
+  { revalidate: 60 }
 );
