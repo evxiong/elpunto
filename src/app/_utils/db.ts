@@ -8,7 +8,7 @@ import { Headline } from "../_components/card";
 // lambda will run at 12:45, 20:45 UTC daily
 
 export const getTop = async (pk: string) => {
-  console.log("Entered getTop()");
+  console.log("Entered getTop(): " + pk);
   const client = DynamoDBDocumentClient.from(
     new DynamoDBClient({ region: "us-west-1" })
   );
