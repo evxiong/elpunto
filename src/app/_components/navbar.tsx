@@ -6,18 +6,22 @@ import Logo from "./logo";
 export default function Navbar() {
   const [curDate, setCurDate] = useState<string>();
   const [curTemp, setCurTemp] = useState<number>();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchWeather = async (pos: GeolocationPosition) => {
+      setLoading(true);
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=temperature_2m&temperature_unit=fahrenheit`
       );
       const json = await response.json();
-      console.log(json);
       setCurTemp(Math.round(json.current.temperature_2m));
+      setLoading(false);
     };
 
-    navigator.geolocation.getCurrentPosition(fetchWeather);
+    navigator.geolocation.getCurrentPosition(fetchWeather, () =>
+      setLoading(false)
+    );
 
     let now = new Date();
     setCurDate(
@@ -34,9 +38,15 @@ export default function Navbar() {
     <>
       <div className="relative flex flex-row select-none justify-center items-center py-6 sm:py-8">
         <div className="flex flex-row items-center gap-6 sm:flex absolute left-0 font-manrope font-medium text-sm">
-          <div className="hidden sm:flex font-manrope font-medium text-[13px] text-neutral-500 dark:text-gray-400">
-            {curDate && <span>{curDate}</span>}
-            {curTemp && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</span>}
+          <div className="hidden sm:flex flex-row items-center font-manrope font-medium text-[13px] text-neutral-500 dark:text-gray-400">
+            {loading ? (
+              <div className="h-4 w-36 rounded-full bg-gray-100 dark:bg-gray-700 animate-pulse"></div>
+            ) : (
+              <>
+                {curDate && <span>{curDate}</span>}{" "}
+                {curTemp && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</span>}
+              </>
+            )}
           </div>
         </div>
         <Logo />
@@ -65,12 +75,14 @@ export default function Navbar() {
 
       {/* Mobile navbar */}
       <div className="select-none sm:hidden border font-manrope text-sm font-medium text-neutral-700 border-gray-200 dark:border-gray-700 rounded-md mb-4 p-4 flex flex-row gap-2 justify-between">
-        <div className="sm:hidden font-manrope font-medium text-[13px] text-neutral-500 dark:text-gray-400 line-clamp-1">
-          {curDate && (
-            <span>
-              {curDate}
-              {curTemp && <>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</>}
-            </span>
+        <div className="sm:hidden font-manrope flex items-center font-medium text-[13px] text-neutral-500 dark:text-gray-400 line-clamp-1">
+          {loading ? (
+            <div className="h-4 w-36 rounded-full bg-gray-100 dark:bg-gray-700 animate-pulse"></div>
+          ) : (
+            <>
+              {curDate && <span>{curDate}</span>}{" "}
+              {curTemp && <span>&nbsp;&nbsp;·&nbsp;&nbsp;{curTemp}°F</span>}
+            </>
           )}
         </div>
         <a
