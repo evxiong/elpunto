@@ -32,7 +32,7 @@ const ICONS = {
   NPR: "https://media.npr.org/chrome/favicon/favicon-32x32.png",
   "PBS Newshour":
     "https://d3i6fh83elv35t.cloudfront.net/static/assets/images/favicon/favicon-32x32.png",
-  Politico: "https://www.politico.com/favicon-32x32.png",
+  Politico: "https://static.politico.com/cf/05/ee684a274496b04fa20ba2978da1/politico.png",
   "r/news":
     "https://styles.redditmedia.com/t5_2qh3l/styles/communityIcon_fmygcobc22z81.png",
   Reuters:
