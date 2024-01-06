@@ -1,6 +1,5 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
-// import { unstable_cache } from "next/cache";
 import { Headline } from "../_components/card";
 
 // partition key is <section#timestamp> where section is "Top" for now
