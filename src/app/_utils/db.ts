@@ -10,7 +10,9 @@ import { Headline } from "../_components/card";
 export const getTop = unstable_cache(
   async (pk: string) => {
     console.log("Entered getTop()");
-    const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+    const client = DynamoDBDocumentClient.from(
+      new DynamoDBClient({ region: "us-west-1" })
+    );
     const response = await client.send(
       new QueryCommand({
         TableName: process.env.TABLE_NAME,
