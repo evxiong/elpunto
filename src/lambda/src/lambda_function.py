@@ -1,10 +1,9 @@
-from tqdm import tqdm
 from datetime import datetime, timezone, timedelta
 from dateutil import parser, tz
-from dotenv import load_dotenv
 from bertopic import BERTopic
 from bertopic.representation import KeyBERTInspired
 from sklearn.cluster import AgglomerativeClustering
+from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 import feedparser
 import pandas as pd
@@ -18,8 +17,6 @@ import json
 LAMBDA_EARLY = 13
 LAMBDA_LATE = 21
 
-load_dotenv("../../.env.local")
-
 
 def generate_times():
     """Generates rounded timestamp and ttl for db.
@@ -28,15 +25,22 @@ def generate_times():
     to be used in PK for database. TTL is generated 24 hours after
     timestamp for auto-deletion.
 
+    Actual Lambda runs 15 min before LAMBDA_EARLY and LAMBDA_LATE
+    to ensure smooth updates for users.
+
     Returns:
         Tuple (a, b) where a is ISO 8601 string of write time
         (either 13:00 or 21:00 UTC) and b is epoch format of 1 day
         after, which is TTL expiration date in db.
     """
     now = datetime.now(timezone.utc)
-    # now = datetime.strptime('12-24-2023 13:01', '%m-%d-%Y %H:%M')
 
-    if now.hour >= LAMBDA_EARLY and now.hour < LAMBDA_LATE:
+    # if currently btwn < 30 min before LAMBDA_EARLY, and < 30 min before LAMBDA_LATE
+    if (
+        (now.hour == LAMBDA_EARLY - 1 and now.minute >= 30) or now.hour >= LAMBDA_EARLY
+    ) and (
+        (now.hour == LAMBDA_LATE - 1 and now.minute < 30) or now.hour < LAMBDA_LATE - 1
+    ):
         now = now.replace(hour=LAMBDA_EARLY)
     else:
         if now.hour < LAMBDA_EARLY:
@@ -62,8 +66,8 @@ def collect_feeds():
     rss_links = df["Feed"].tolist()
     sources = list(df.itertuples(index=False, name=None))
 
-    print("Parsing RSS feeds...")
-    feeds = [feedparser.parse(link) for link in tqdm(rss_links)]
+    print("Parsing RSS feeds...", end="")
+    feeds = [feedparser.parse(link) for link in rss_links]
 
     h = html2text.HTML2Text()
     h.ignore_links = True
@@ -131,6 +135,7 @@ def collect_feeds():
                             )
                             links.add(entry["link"])
 
+    print("DONE")
     return data, headlines
 
 
@@ -141,8 +146,9 @@ def cluster(headlines):
         BERTopic model after topic generation.
     """
     cluster_model = AgglomerativeClustering(n_clusters=None, distance_threshold=1.5)
+    embedding_model = SentenceTransformer("./all-MiniLM-L6-v2")
     topic_model = BERTopic(
-        embedding_model="all-MiniLM-L6-v2",
+        embedding_model=embedding_model,
         hdbscan_model=cluster_model,
         representation_model=KeyBERTInspired(),
     )
@@ -249,7 +255,7 @@ def gpt_request(repr_docs_map, ranked_topics, topic_model):
     prompt = """You are a news aggregator service. Here's a list of news headline clusters. Each sublist contains a small but representative subset of all headlines in the same cluster: %s. For each sublist, perform exactly the following steps (treat each cluster independently):
 1. Based on the headlines, classify the cluster as belonging to one of the following categories: U.S., World, Politics, Business, Tech, Sports, Entertainment, Science, Health. If it belongs to multiple categories, choose the more specific one.
 2. Use the headlines to generate a summary news headline for the cluster in the style of The New York Times (max 10 words).
-The clusters are described by the following keywords: %s. Based on the keywords and headlines, determine the news story that each cluster is about (ex. "Russia-Ukraine War").
+The clusters are described by the following keywords: %s. Based on the keywords and headlines, determine the news topic/story that each cluster is about (ex. "Russia-Ukraine War"), max 5 words.
 Answer with an array of JSON objects in a single line without whitespaces: [{"category":<category>,"topic":<topic>,"summary":<summary>},...]""" % (
         prompt_titles,
         prompt_keywords,
@@ -310,7 +316,7 @@ def prepare_transaction(gpt_responses, repr_docs_map, ranked_topics):
 
 def perform_transaction(transact_items):
     """Write items to db."""
-    dynamodb = boto3.resource("dynamodb")
+    dynamodb = boto3.resource("dynamodb", region_name="us-west-1")
 
     try:
         dynamodb.meta.client.transact_write_items(TransactItems=transact_items)
@@ -320,7 +326,7 @@ def perform_transaction(transact_items):
         print("Successfully wrote items to db")
 
 
-def main():
+def lambda_handler(event, context):
     data, headlines = collect_feeds()
     topic_model = cluster(headlines)
     repr_articles_map = get_representative_articles(data, topic_model)
@@ -330,7 +336,4 @@ def main():
         gpt_responses, repr_articles_map, ranked_topics
     )
     perform_transaction(transact_items)
-
-
-if __name__ == "__main__":
-    main()
+    return {"statusCode": 200, "body": gpt_responses}
