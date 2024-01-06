@@ -4,7 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
-/src/lambda/package
+/src/lambda/src/all-MiniLM-L6-v2
 
 # testing
 /coverage
