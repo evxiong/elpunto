@@ -35,3 +35,6 @@ export default async function Home() {
     </>
   );
 }
+
+// Call getTop every 2m at most
+export const revalidate = 120;
