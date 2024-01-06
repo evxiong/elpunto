@@ -253,8 +253,8 @@ def gpt_request(repr_docs_map, ranked_topics, topic_model):
     )
 
     prompt = """You are a news aggregator service. Here's a list of news headline clusters. Each sublist contains a small but representative subset of all headlines in the same cluster: %s. For each sublist, perform exactly the following steps (treat each cluster independently):
-1. Based on the headlines, classify the cluster as belonging to one of the following categories: U.S., World, Politics, Business, Tech, Sports, Entertainment, Science, Health. If it belongs to multiple categories, choose the more specific one.
-2. Use the headlines to generate a summary news headline for the cluster in the style of The New York Times (max 10 words).
+1. Based on the headlines, classify the cluster as belonging to exactly one of the following categories: U.S., World, Politics, Business, Tech, Sports, Entertainment, Science, Health.
+2. Summarize the cluster's headlines in the style of a The New York Times headline (max 10 words).
 The clusters are described by the following keywords: %s. Based on the keywords and headlines, determine the news topic/story that each cluster is about (ex. "Russia-Ukraine War"), max 5 words.
 Answer with an array of JSON objects in a single line without whitespaces: [{"category":<category>,"topic":<topic>,"summary":<summary>},...]""" % (
         prompt_titles,
