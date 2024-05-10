@@ -16,7 +16,7 @@ const CATEGORIES = {
 
 const ICONS = {
   "ABC News": "https://s.abcnews.com/assets/dtci/images/favicon.ico",
-  Axios: "https://www.axios.com/images/a_favicon-32.png",
+  Axios: "https://www.axios.com/images/apple-touch-icon.png",
   "BBC News": "https://www.bbc.com/bbcx/favicon-32x32.png",
   "CBS News":
     "https://www.cbsnews.com/fly/bundles/cbsnewscore/icons/icon-192x192.png",
