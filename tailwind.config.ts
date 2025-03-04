@@ -23,7 +23,6 @@ const config: Config = {
         health: "#D242A9",
       },
       fontFamily: {
-        // graphik: ['var(--font-graphik)', 'ui-sans-serif', 'system-ui'],
         manrope: ["var(--font-manrope)", "ui-sans-serif", "system-ui"],
         space: ["var(--font-space-grotesk)", "ui-monospace", "monospace"],
       },
