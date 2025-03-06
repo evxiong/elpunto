@@ -329,7 +329,7 @@ def gpt_request(
 2. Summarize the cluster's headlines in the style of a New York Times headline. The summary must be 8 words or less.
 3. Based on the keywords and headlines, determine the news topic that each cluster is about. The topic must be 4 words or less (ex. "Russia-Ukraine War").
 4. Some headlines within the cluster might not belong to this topic. For each headline, if you are more than 90%% confident that it does not belong this topic, store this headline's index in an array called "excluded_indices". Indices start from 0.
-You must respond with an array of JSON objects (one object per cluster) in a single line without whitespaces, in exactly the following format: [{"category":<category>,"topic":<topic>,"summary":<summary>,"excluded_indices":<excluded_indices>},...]""" % (
+Provide your answer as an array of JSON objects in a single line without whitespaces, in exactly the following format: [{"category":<category>,"topic":<topic>,"summary":<summary>,"excluded_indices":<excluded_indices>},...]""" % (
         json.dumps(prompt_titles, separators=(",", ":"), ensure_ascii=False),
         json.dumps(prompt_keywords, separators=(",", ":"), ensure_ascii=False),
     )
@@ -449,4 +449,4 @@ def lambda_handler(event, context):
         gpt_responses, topic_to_repr_articles, ranked_topics, 6
     )
     perform_transaction(transact_items)
-    return {"statusCode": 200, "body": gpt_responses}
+    return {"statusCode": 200, "body": [r.model_dump() for r in gpt_responses]}
