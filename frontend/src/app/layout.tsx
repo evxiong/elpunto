@@ -33,11 +33,11 @@ export default function RootLayout({
       className={`${space_grotesk.variable} ${manrope.variable}`}
       suppressHydrationWarning
     >
-      <body className="mx-auto max-w-screen-2xl px-4 dark:bg-gray-800 dark:text-white sm:px-10">
-        <ThemeProvider attribute="class" disableTransitionOnChange>
+      <ThemeProvider attribute="class" disableTransitionOnChange>
+        <body className="mx-auto max-w-screen-2xl px-4 dark:bg-gray-800 dark:text-white sm:px-10">
           {children}
-        </ThemeProvider>
-      </body>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }
