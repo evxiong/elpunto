@@ -3,6 +3,7 @@ import csv
 import feedparser
 import html2text
 import json
+import logging
 import os
 import pandas as pd
 import re
@@ -423,17 +424,12 @@ def prepare_transaction(
 
 def perform_transaction(transact_items: list[dict]):
     """Write items to DynamoDB."""
-    dynamodb = boto3.resource(
-        "dynamodb",
-        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        region_name="us-west-1",
-    )
+    dynamodb = boto3.resource("dynamodb", region_name="us-west-1")
 
     try:
         dynamodb.meta.client.transact_write_items(TransactItems=transact_items)  # type: ignore
-    except Exception as exception:
-        print("Exception raised: " + exception.__class__.__name__)
+    except Exception:
+        logging.exception("DynamoDB exception")
     else:
         print("Successfully wrote items to db")
 
