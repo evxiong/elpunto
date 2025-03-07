@@ -1,9 +1,9 @@
-<h1>
+<h1 align="center">
   <a href="https://elpunto.vercel.app" target="_blank" rel="noopener noreferrer">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/948a0ab6-e48e-4d0b-9e34-daf1a254b717">
       <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/2ed89018-0925-411d-a031-3f0e1782ef9b">
-      <img alt="EFI logo" height="40" src="https://github.com/user-attachments/assets/948a0ab6-e48e-4d0b-9e34-daf1a254b717">
+      <img alt="El Punto logo" height="40" src="https://github.com/user-attachments/assets/948a0ab6-e48e-4d0b-9e34-daf1a254b717">
     </picture>
   </a>
 </h1>
