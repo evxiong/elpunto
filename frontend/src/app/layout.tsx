@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Space_Grotesk, Manrope } from "next/font/google";
-import { Providers } from "./providers";
+import { ThemeProvider } from "next-themes";
 
 const space_grotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -19,7 +19,7 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: "El Punto - News, simplified.",
-  description: "News, simplified.",
+  description: "The latest headlines from across the web, all in one place.",
 };
 
 export default function RootLayout({
@@ -28,9 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${space_grotesk.variable} ${manrope.variable}`}>
-      <body className="mx-auto max-w-screen-2xl px-4 sm:px-10 dark:bg-gray-800 dark:text-white">
-        <Providers>{children}</Providers>
+    <html
+      lang="en"
+      className={`${space_grotesk.variable} ${manrope.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="mx-auto max-w-screen-2xl px-4 dark:bg-gray-800 dark:text-white sm:px-10">
+        <ThemeProvider attribute="class" disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
