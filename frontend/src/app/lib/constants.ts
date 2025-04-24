@@ -13,7 +13,8 @@ export const CATEGORIES = {
 export const ICONS = {
   "ABC News": "https://s.abcnews.com/assets/dtci/images/favicon.ico",
   Axios: "https://www.axios.com/images/apple-touch-icon.png",
-  "BBC News": "https://www.bbc.com/bbcx/favicon-32x32.png",
+  "BBC News":
+    "https://static.files.bbci.co.uk/bbcdotcom/web/20250409-091508-0ef9b7676-web-2.19.1-12/favicon.ico",
   "CBS News":
     "https://www.cbsnews.com/fly/bundles/cbsnewscore/icons/icon-192x192.png",
   CNN: "https://www.cnn.com/media/sites/cnn/favicon.ico",
