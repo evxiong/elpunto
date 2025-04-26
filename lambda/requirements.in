@@ -1,0 +1,10 @@
+boto3
+feedparser
+html2text
+pandas
+bertopic
+python-dateutil
+openai
+pydantic
+sentence-transformers
+scikit-learn

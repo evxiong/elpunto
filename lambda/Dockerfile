@@ -10,11 +10,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --target ${FUNCTION_DIR} awslambdaric
 RUN pip install --no-cache-dir --target ${FUNCTION_DIR} -r requirements.txt
 RUN pip install --no-cache-dir --target ${FUNCTION_DIR} \
-    torch==2.6.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+    torch==2.7.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir --target ${FUNCTION_DIR} \
-    --no-deps sentence-transformers==3.4.1
+    --no-deps sentence-transformers==4.1.0
 RUN pip install --no-cache-dir --target ${FUNCTION_DIR} \
-    --no-deps bertopic==0.16.4
+    --no-deps bertopic==0.17.0
 
 FROM python:3.12-slim
 ARG FUNCTION_DIR
