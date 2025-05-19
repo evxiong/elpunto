@@ -143,9 +143,13 @@ def collect_feeds(file_path: str = "top.csv") -> list[Article]:
 
                 # Pre-processing: exclude any articles over 2 days old.
                 if (
-                    current_time
-                    - parser.parse(date_string, tzinfos=tzinfos).astimezone(tz.UTC)
-                ).days < 2:
+                    date_string
+                    and (
+                        current_time
+                        - parser.parse(date_string, tzinfos=tzinfos).astimezone(tz.UTC)
+                    ).days
+                    < 2
+                ):
                     articles.append(
                         Article(
                             link=article_link,
