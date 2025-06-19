@@ -1,13 +1,18 @@
 export const CATEGORIES = {
-  "U.S.": "text-us bg-us",
-  World: "text-world bg-world",
-  Politics: "text-politics bg-politics",
-  Business: "text-business bg-business",
-  Tech: "text-tech bg-tech",
-  Sports: "text-sports bg-sports",
-  Entertainment: "text-entertainment bg-entertainment",
-  Science: "text-science bg-science",
-  Health: "text-health bg-health",
+  "U.S.": "text-rose-700 bg-rose-100 dark:text-rose-400 dark:bg-rose-700/30",
+  World: "text-cyan-700 bg-cyan-100 dark:text-cyan-500 dark:bg-cyan-700/30",
+  Politics:
+    "text-violet-700 bg-violet-100 dark:text-violet-400 dark:bg-violet-700/30",
+  Business:
+    "text-green-700 bg-green-100 dark:text-green-500 dark:bg-green-700/30",
+  Tech: "text-lime-700 bg-lime-100 dark:text-lime-500 dark:bg-lime-700/30",
+  Sports: "text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-700/30",
+  Entertainment:
+    "text-amber-700 bg-amber-100 dark:text-amber-500 dark:bg-amber-700/30",
+  Science:
+    "text-slate-700 bg-slate-100 dark:text-slate-400 dark:bg-slate-600/30",
+  Health:
+    "text-fuchsia-700 bg-fuchsia-100 dark:text-fuchsia-400 dark:bg-fuchsia-700/30",
 } as const;
 
 export const ICONS = {

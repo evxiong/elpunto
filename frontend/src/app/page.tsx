@@ -1,6 +1,7 @@
 import Card from "@/app/components/card";
 import { getKey, getTop } from "./lib/db";
 import Navbar from "@/app/components/navbar";
+import { Categories } from "./_unused";
 
 export default async function Home() {
   const headlines = await getTop(getKey());
@@ -8,7 +9,7 @@ export default async function Home() {
   return (
     <>
       <Navbar />
-      <main className="mb-10">
+      <main id="content" className="mb-10">
         <Card headlines={headlines} />
       </main>
     </>
