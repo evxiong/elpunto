@@ -1,0 +1,27 @@
+type,name,feed,icon
+All,ABC News,https://abcnews.go.com/abcnews/topstories,https://s.abcnews.com/assets/dtci/images/favicon.ico
+All,Axios,https://api.axios.com/feed/,https://www.axios.com/images/apple-touch-icon.png
+All,BBC News,http://feeds.bbci.co.uk/news/rss.xml?edition=us,https://static.files.bbci.co.uk/bbcdotcom/web/20260427-074339-4d487e3684-web-3.2.0-4/favicon-32x32.png
+All,Bloomberg,https://feeds.bloomberg.com/politics/news.rss,https://www.bloomberg.com/favicon-black.png
+All,CBS News,https://www.cbsnews.com/latest/rss/main,https://www.cbsnews.com/fly/bundles/cbsnewscore/icons/icon-192x192.png
+All,The Guardian,https://www.theguardian.com/us/rss,https://assets.guim.co.uk/static/frontend/icons/homescreen/apple-touch-icon-120.png
+All,The Hill,https://thehill.com/homenews/feed/,https://thehill.com/wp-content/uploads/sites/2/2023/03/cropped-favicon-512px-1.png?w=32
+All,NBC News,https://feeds.nbcnews.com/nbcnews/public/news,https://nodeassets.nbcnews.com/cdnassets/projects/ramen/favicon/nbcnews/all-other-sizes-PNG.ico/favicon-32x32.png
+All,The New York Times,https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml,https://www.nytimes.com/vi-assets/static-assets/apple-touch-icon-28865b72953380a40aa43318108876cb.png
+All,The New Yorker,https://www.newyorker.com/feed/news/rss,https://www.newyorker.com/verso/static/thenewyorker-us/assets/favicon.ico
+All,NPR,https://feeds.npr.org/1001/rss.xml,https://media.npr.org/chrome/favicon/favicon-32x32.png
+All,PBS Newshour,https://www.pbs.org/newshour/feeds/rss/headlines,https://d3i6fh83elv35t.cloudfront.net/static/assets/images/favicon/2024/favicon-32x32.png
+All,ProPublica,https://www.propublica.org/feeds/propublica/main,https://www.propublica.org/wp-content/uploads/2026/05/site-icon.png?w=32
+All,r/news,https://www.reddit.com/r/news/top.rss,https://styles.redditmedia.com/t5_2qh3l/styles/communityIcon_fmygcobc22z81.png
+All,Reuters,https://news.google.com/rss/search?q=when:24h+allinurl:reuters.com&ceid=US:en&hl=en-US&gl=US,https://www.reuters.com/pf/resources/images/reuters/favicon/tr_fvcn_kinesis_32x32_v2.ico?d=361
+All,Time,https://time.com/feed/,https://time.com/favicon/favicon-32x32.png
+All,Vox,https://www.vox.com/rss/index.xml,https://www.vox.com/static-assets/icons/favicon-32x32.png
+All,The Washington Post,https://feeds.washingtonpost.com/rss/homepage,https://www.washingtonpost.com/favicon.ico
+Sports,The Athletic,https://theathletic.com/feeds/rss/news/,https://www.nytimes.com/athletic/static/img/athletic-icon-96x96.png
+Sports,ESPN,https://www.espn.com/espn/rss/news,https://a.espncdn.com/wireless/mw5/r1/images/bookmark-icons-v2/espn-icon-57x57.png
+Business,CNBC,https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114,https://fm.cnbc.com/applications/cnbc.com/resources/img/CNBC_LOGO_FAVICON_1C_KO_RGB.ico
+Business,Financial Times,https://www.ft.com/rss/home/international,https://images.ft.com/v3/image/raw/ftlogo-v1%3Abrand-ft-logo-square-coloured?source=page-kit&format=png&width=32&height=32
+World,Al Jazeera,https://www.aljazeera.com/xml/rss/all.xml,https://www.aljazeera.com/favicon_aje.ico
+World,Bellingcat,https://www.bellingcat.com/feed,https://www.bellingcat.com/app/themes/bellingcat/assets/icons/favicons/favicon-32x32.png
+World,Deutsche Welle,https://rss.dw.com/rdf/rss-en-world,https://www.dw.com/images/icons/favicon-32x32.png
+World,Drop Site News,https://www.dropsitenews.com/feed,https://substack-post-media.s3.amazonaws.com/public/images/9c6f6fc7-21ff-40e2-a82b-e250318d4286/favicon-32x32.png

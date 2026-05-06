@@ -1,7 +1,7 @@
-import "./globals.css";
 import type { Metadata } from "next";
-import { Space_Grotesk, Manrope } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { Manrope, Space_Grotesk } from "next/font/google";
+import "./globals.css";
 
 const space_grotesk = Space_Grotesk({
   subsets: ["latin"],

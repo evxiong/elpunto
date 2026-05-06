@@ -1,7 +1,8 @@
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+loadEnvConfig("..", undefined, console, true);
+
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

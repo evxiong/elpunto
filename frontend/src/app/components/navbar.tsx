@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Logo from "./logo";
 import { IconArrowUpRight, IconTemperatureSun } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import Logo from "./logo";
 
 export default function Navbar() {
   const [curTemp, setCurTemp] = useState<number>();
@@ -89,7 +89,7 @@ export default function Navbar() {
           href="https://github.com/evxiong/elpunto"
           target="_blank"
           rel="noreferrer noopener"
-          className="-m-1 -ml-2 flex flex-shrink-0 items-center rounded-sm p-1 pl-2 font-manrope text-[13px] font-medium text-gray-500 underline decoration-gray-500 underline-offset-4 outline-none transition-all hover:cursor-pointer hover:decoration-gray-200 focus-visible:bg-gray-800/5 focus-visible:decoration-gray-200 focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:outline-gray-300 dark:text-gray-400 dark:decoration-gray-400 dark:hover:decoration-gray-700 dark:focus-visible:bg-white/5 dark:focus-visible:decoration-gray-700 dark:focus-visible:outline-gray-500"
+          className="-m-1 -ml-2 flex shrink-0 items-center rounded-sm p-1 pl-2 font-manrope text-[13px] font-medium text-gray-500 underline decoration-gray-500 underline-offset-4 outline-none transition-all hover:cursor-pointer hover:decoration-gray-200 focus-visible:bg-gray-800/5 focus-visible:decoration-gray-200 focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:outline-gray-300 dark:text-gray-400 dark:decoration-gray-400 dark:hover:decoration-gray-700 dark:focus-visible:bg-white/5 dark:focus-visible:decoration-gray-700 dark:focus-visible:outline-gray-500"
         >
           <span className="mr-0.5 cursor-pointer underline-offset-2">
             View on GitHub

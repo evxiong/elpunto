@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "tsx scripts/addFeeds.ts",
     "dev": "next dev",
+    "prebuild": "tsx scripts/addFeeds.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -11,6 +13,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.758.0",
     "@aws-sdk/lib-dynamodb": "^3.758.0",
+    "@next/env": "^16.2.4",
     "@radix-ui/react-popover": "^1.1.14",
     "@tabler/icons-react": "^3.31.0",
     "@types/node": "22.13.8",
@@ -19,7 +22,7 @@
     "dayjs": "^1.11.13",
     "eslint": "9.21.0",
     "eslint-config-next": "^15.2.0",
-    "next": "^15.3.1",
+    "next": "^15.3.8",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -30,6 +33,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.5.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0"
   }
 }

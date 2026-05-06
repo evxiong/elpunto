@@ -1,6 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { Headline } from "./types";
+import type { Headline } from "./types";
 
 // partition key is <section#timestamp> where section is "Top" for now
 // sort key is <cluster>

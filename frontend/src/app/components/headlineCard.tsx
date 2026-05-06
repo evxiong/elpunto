@@ -1,22 +1,39 @@
 "use client";
 
+import FEEDS from "@/app/feeds.json";
+import { IconChevronDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import updateLocal from "dayjs/plugin/updateLocale";
-import { CATEGORIES, ICONS } from "../lib/constants";
-import { ArticleInfo, Headline } from "../lib/types";
 import { useState } from "react";
-import { IconChevronDown } from "@tabler/icons-react";
+import type { ArticleInfo, Category, Headline } from "../lib/types";
+
+export const CATEGORY_STYLES: Record<Category, string> = {
+  "U.S.": "text-rose-700 bg-rose-100 dark:text-rose-400 dark:bg-rose-700/30",
+  World: "text-cyan-700 bg-cyan-100 dark:text-cyan-500 dark:bg-cyan-700/30",
+  Politics:
+    "text-violet-700 bg-violet-100 dark:text-violet-400 dark:bg-violet-700/30",
+  Business:
+    "text-green-700 bg-green-100 dark:text-green-500 dark:bg-green-700/30",
+  Tech: "text-lime-700 bg-lime-100 dark:text-lime-500 dark:bg-lime-700/30",
+  Sports: "text-blue-700 bg-blue-100 dark:text-blue-400 dark:bg-blue-700/30",
+  Entertainment:
+    "text-amber-700 bg-amber-100 dark:text-amber-500 dark:bg-amber-700/30",
+  Science:
+    "text-slate-700 bg-slate-100 dark:text-slate-400 dark:bg-slate-600/30",
+  Health:
+    "text-fuchsia-700 bg-fuchsia-100 dark:text-fuchsia-400 dark:bg-fuchsia-700/30",
+};
 
 export default function HeadlineCard({ headline }: { headline: Headline }) {
   const [expanded, setExpanded] = useState(false);
   const numArticles = expanded ? headline.articles.length : 3;
   return (
     <div className="w-full rounded-md border border-gray-200 pt-4 dark:border-gray-700">
-      <p className="mb-2 line-clamp-1 px-4 font-space text-xs font-normal leading-5 text-gray-700 dark:text-gray-400">
+      <p className="mb-2 line-clamp-1 px-4 font-space text-xs/5 font-normal text-gray-700 dark:text-gray-400">
         <span
           className={`${
-            CATEGORIES[headline.category]
+            CATEGORY_STYLES[headline.category]
           } rounded-full px-1.5 py-0.5 font-medium`}
         >
           {headline.category}
@@ -86,9 +103,9 @@ function Article({ info }: { info: ArticleInfo }) {
     >
       <img
         aria-hidden="true"
-        src={ICONS[info.source]}
+        src={FEEDS[info.source]}
         alt={info.source + " icon"}
-        className="pointer-events-none mt-[2px] h-5 w-5 flex-shrink-0 self-start rounded-sm border border-gray-200 dark:border-gray-700"
+        className="pointer-events-none mt-[2px] size-5 shrink-0 self-start rounded-sm border border-gray-200 dark:border-gray-700"
       />
       <div className="flex flex-col gap-0.5 leading-4 tracking-normal dark:text-gray-300">
         {info.title}
