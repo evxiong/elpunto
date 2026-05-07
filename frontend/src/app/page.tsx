@@ -1,9 +1,9 @@
 import Card from "@/app/components/card";
 import Navbar from "@/app/components/navbar";
-import { getKey, getTop } from "./lib/db";
+import { getTimestamp, getTop } from "./lib/db";
 
 export default async function Home() {
-  const headlines = await getTop(getKey());
+  const headlines = await getTop(getTimestamp());
 
   return (
     <>

@@ -2,8 +2,8 @@
 // keys are source names and values are icon URLs, saved to `src/app/feeds.json`
 // for use in Next.js app.
 
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 /**
  * Parses CSV string and returns single Object whose keys are row fields under
