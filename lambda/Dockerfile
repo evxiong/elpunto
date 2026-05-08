@@ -1,28 +1,26 @@
 ARG FUNCTION_DIR="/function"
 
-FROM python:3.12 AS build-image
-ARG FUNCTION_DIR
-RUN mkdir -p ${FUNCTION_DIR}
-COPY src ${FUNCTION_DIR}
 
 # Install requirements
-COPY requirements.txt .
-RUN pip install --no-cache-dir --target ${FUNCTION_DIR} awslambdaric
-RUN pip install --no-cache-dir --target ${FUNCTION_DIR} -r requirements.txt
-RUN pip install --no-cache-dir --target ${FUNCTION_DIR} \
-    torch==2.7.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache-dir --target ${FUNCTION_DIR} \
-    --no-deps sentence-transformers==4.1.0
-RUN pip install --no-cache-dir --target ${FUNCTION_DIR} \
-    --no-deps bertopic==0.17.0
+FROM python:3.12 AS builder
 
-FROM python:3.12-slim
+ARG FUNCTION_DIR
+WORKDIR ${FUNCTION_DIR}
+
+COPY src requirements.txt ./
+RUN pip install --no-cache-dir --target . awslambdaric
+RUN pip install --no-cache-dir --target . -r requirements.txt
+
+
+# Production image
+FROM python:3.12-slim AS runner
+
 ARG FUNCTION_DIR
 WORKDIR ${FUNCTION_DIR}
 
 ENV NUMBA_CACHE_DIR=/tmp
 
-COPY --from=build-image ${FUNCTION_DIR} ${FUNCTION_DIR}
+COPY --from=builder ${FUNCTION_DIR} .
 
 ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
 CMD ["lambda_function.lambda_handler"]

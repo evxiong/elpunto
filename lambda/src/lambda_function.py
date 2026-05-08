@@ -1,28 +1,26 @@
-import boto3
 import csv
-import feedparser
-import html2text
 import json
 import logging
 import os
-import pandas as pd
 import re
-from bertopic import BERTopic
-from bertopic.representation import KeyBERTInspired
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from dateutil import parser, tz
 from enum import StrEnum
+from typing import Any
+
+import boto3
+import feedparser
+import html2text
+import pandas as pd
+from bertopic import BERTopic
+from bertopic.representation import KeyBERTInspired
+from dateutil import parser, tz
 from feedparser import FeedParserDict
 from openai import OpenAI
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from sklearn.cluster import AgglomerativeClustering
-from typing import Any
-
-LAMBDA_EARLY = 13
-LAMBDA_LATE = 21
 
 
 @dataclass
@@ -54,49 +52,149 @@ class GPTResponse(BaseModel):
     excluded_indices: list[int]
 
 
-def generate_times() -> tuple[str, int]:
-    """Generate rounded timestamp and ttl for db.
+def get_env(name: str):
+    var = os.getenv(name)
+    if var is None:
+        raise Exception(f"{name} env var not set")
+    return var
 
-    Timestamp is rounded down to either LAMBDA_EARLY or LAMBDA_LATE to be used
-    in PK for database. TTL is generated 24 hours after timestamp for
-    auto-deletion.
 
-    Actual Lambda runs 15 min before LAMBDA_EARLY and LAMBDA_LATE to ensure
-    smooth updates for users.
+def get_schedule() -> list[int]:
+    """Parse, validate, and sort `SCHEDULE` env var.
 
     Returns:
-        tuple[str, int]: where str is ISO 8601 string of write time (either
-            13:00 or 21:00 UTC) and int is epoch format of 1 day after, which is
-            TTL expiration date in db.
+        list[int]: schedule parsed as list of integers representing HHMM times,
+            sorted in ascending order.
     """
+    schedule = get_env("SCHEDULE")
+
+    if not (schedule.strip().startswith("[") and schedule.strip().endswith("]")):
+        raise Exception("SCHEDULE env var is not an array")
+
+    def str_to_int(s: str) -> int:
+        try:
+            return int(s)
+        except ValueError:
+            raise Exception(f"SCHEDULE env var contains invalid time: {s}")
+
+    schedule = [str_to_int(t.strip()) for t in (schedule.strip()[1:-1]).split(",")]
+
+    if len(schedule) == 0:
+        raise Exception("SCHEDULE env var is empty")
+
+    for time in schedule:
+        if time < 0 or time > 2359 or time % 100 > 59:
+            raise Exception(f"SCHEDULE env var contains invalid time: {time}")
+
+    return sorted(schedule)
+
+
+def generate_timestamps() -> tuple[str, int]:
+    """Generate PK timestamp and TTL expiration timestamp for db.
+
+    PK timestamp is rounded down (or up, if within `SCHEDULE_BUFFER`) to nearest
+    `SCHEDULE` time. Expiration timestamp is 1 day after PK timestamp for
+    auto-deletion.
+
+    Actual Lambda runs `SCHEDULE_BUFFER` min before each `SCHEDULE` time to
+    ensure smooth updates for users.
+
+    Returns:
+        tuple[str, int]: where str is ISO 8601 update timestamp, and int
+            is Unix expiration timestamp.
+    """
+
+    def subtract_from_hhmm(hhmm: int, amount: int):
+        # convert hhmm to total minutes since midnight
+        hours = hhmm // 100
+        minutes = hhmm % 100
+        total_minutes = hours * 60 + minutes
+
+        res_total_minutes = (total_minutes - amount) % 1440
+        res_hours = res_total_minutes // 60
+        res_minutes = res_total_minutes % 60
+        return res_hours * 100 + res_minutes
+
+    schedule = get_schedule()
+    buffer = int(get_env("SCHEDULE_BUFFER"))
     now = datetime.now(timezone.utc)
+    now_hhmm = now.hour * 100 + now.minute
 
-    # if currently btwn < 30 min before LAMBDA_EARLY, and < 30 min before LAMBDA_LATE
-    if (
-        (now.hour == LAMBDA_EARLY - 1 and now.minute >= 30) or now.hour >= LAMBDA_EARLY
-    ) and (
-        (now.hour == LAMBDA_LATE - 1 and now.minute < 30) or now.hour < LAMBDA_LATE - 1
-    ):
-        now = now.replace(hour=LAMBDA_EARLY)
-    else:
-        if now.hour < LAMBDA_EARLY:
+    # 2 cases:
+    #   1. schedule[0]-buffer interval does not cross 0000 (and 2400)
+    #      - subtract buffer from each schedule time, use as new schedule
+    #      - if current time before earliest schedule time, set timestamp to
+    #        prev day schedule[n-1]+buffer
+    #      - if current time between schedule times or after latest schedule
+    #        time, set timestamp to schedule[i]+buffer
+    #   2. schedule[0]-buffer interval crosses 0000
+    #      - subtract buffer from each schedule time, re-sort, use as new
+    #        schedule
+    #      - if current time before earliest schedule time, set timestamp to
+    #        same day schedule[n-1]+buffer (addition should wraparound)
+    #      - if current time after latest schedule time, set timestamp to next
+    #        day schedule[n-1]+buffer (addition should wraparound)
+    #      - if current time between schedule times, set timestamp to
+    #        schedule[i]+buffer
+
+    cross = True if schedule[0] < subtract_from_hhmm(schedule[0], buffer) else False
+    buffered_schedule = sorted([subtract_from_hhmm(t, buffer) for t in schedule])
+    if not cross:
+        if now_hhmm < buffered_schedule[0]:
             now = now - timedelta(days=1)
-        now = now.replace(hour=LAMBDA_LATE)
+            prev_day_hhmm = subtract_from_hhmm(buffered_schedule[-1], -buffer)
+            now = now.replace(
+                hour=prev_day_hhmm // 100, minute=prev_day_hhmm % 100, second=0
+            )
+        else:
+            for i in range(len(buffered_schedule)):
+                if now_hhmm >= buffered_schedule[i] and (
+                    i + 1 == len(buffered_schedule)
+                    or now_hhmm < buffered_schedule[i + 1]
+                ):
+                    cur_day_hhmm = subtract_from_hhmm(buffered_schedule[i], -buffer)
+                    now = now.replace(
+                        hour=cur_day_hhmm // 100, minute=cur_day_hhmm % 100, second=0
+                    )
+                    break
+    else:
+        if now_hhmm < buffered_schedule[0]:
+            cur_day_hhmm = subtract_from_hhmm(buffered_schedule[-1], -buffer)
+            now = now.replace(
+                hour=cur_day_hhmm // 100, minute=cur_day_hhmm % 100, second=0
+            )
+        elif now_hhmm >= buffered_schedule[-1]:
+            now = now + timedelta(days=1)
+            next_day_hhmm = subtract_from_hhmm(buffered_schedule[-1], -buffer)
+            now = now.replace(
+                hour=next_day_hhmm // 100, minute=next_day_hhmm % 100, second=0
+            )
+        else:
+            for i in range(len(buffered_schedule) - 1):
+                if (
+                    now_hhmm >= buffered_schedule[i]
+                    and now_hhmm < buffered_schedule[i + 1]
+                ):
+                    cur_day_hhmm = subtract_from_hhmm(buffered_schedule[i], -buffer)
+                    now = now.replace(
+                        hour=cur_day_hhmm // 100, minute=cur_day_hhmm % 100, second=0
+                    )
+                    break
 
-    now = now.replace(minute=0, second=0)
-    return now.strftime("%Y-%m-%dT%H:%M:%SZ"), int(
-        (now + timedelta(days=1)).timestamp()
-    )
+    timestamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    expire_at = int((now + timedelta(days=1)).timestamp())
+
+    return timestamp, expire_at
 
 
-def collect_feeds(file_path: str = "top.csv") -> list[Article]:
+def collect_feeds(file_path: str = "feeds.csv") -> list[Article]:
     """Collect articles from RSS feeds in file_path.
 
-    CSV file must have two columns: `name`, the source's name; and `link`, the
-    link to the source's RSS feed.
+    CSV file must have at least two columns: `name`, the source's name; and
+    `feed`, the URL of the source's RSS feed.
 
     Args:
-        file_path (str, optional): path to CSV file. Defaults to `top.csv`.
+        file_path (str, optional): path to CSV file. Defaults to `feeds.csv`.
 
     Returns:
         list[Article]: flat list of all articles from all feeds.
@@ -107,7 +205,7 @@ def collect_feeds(file_path: str = "top.csv") -> list[Article]:
 
     rss_links = [source["feed"] for source in sources]
 
-    print("Parsing RSS feeds...", end="")
+    print("Parsing RSS feeds...", end="", flush=True)
     feeds: list[FeedParserDict] = [feedparser.parse(link) for link in rss_links]
 
     h = html2text.HTML2Text()
@@ -119,16 +217,25 @@ def collect_feeds(file_path: str = "top.csv") -> list[Article]:
 
     eastern = tz.gettz("US/Eastern")
     tzinfos = {"EDT": eastern, "EST": eastern}
-    exclude_descriptions = {"r/news", "Reuters"}
+    exclude_descriptions = {"ProPublica", "r/news", "Reuters"}
     current_time = datetime.now(timezone.utc)
 
     articles = []
     for i, source in enumerate(sources):
         source_links: set[str] = set()
+        source_titles: set[str] = set()
         for entry in feeds[i]["entries"]:
             article_link: str = entry.link  # type: ignore
+            article_title = " ".join(
+                re.sub(
+                    r"-\s+Reuters(.|\n)*",
+                    "",
+                    h.handle(entry.get("title", "")),  # type: ignore
+                ).split()
+            )
             if (
                 article_link not in source_links
+                and article_title not in source_titles
                 and ("published" in entry or "updated" in entry)
                 and (
                     "source" not in entry
@@ -138,7 +245,9 @@ def collect_feeds(file_path: str = "top.csv") -> list[Article]:
                 date_string: str = (  # type: ignore
                     entry.updatedate
                     if "updatedate" in entry
-                    else entry.updated if "updated" in entry else entry.published
+                    else entry.updated
+                    if "updated" in entry
+                    else entry.published
                 )
 
                 # Pre-processing: exclude any articles over 2 days old.
@@ -160,15 +269,11 @@ def collect_feeds(file_path: str = "top.csv") -> list[Article]:
                                     tz.UTC
                                 )
                             ),
-                            title=" ".join(
-                                re.sub(  # type: ignore
-                                    r"-\s+Reuters(.|\n)*",
-                                    "",
-                                    h.handle(entry.get("title", "")),  # type: ignore
-                                ).split()
-                            ),
+                            title=article_title,
                             description=(
-                                " ".join(h.handle(entry.get("summary", "")).split()[:75])  # type: ignore
+                                " ".join(
+                                    h.handle(entry.get("summary", "")).split()[:75]  # type: ignore
+                                )
                                 if source["name"] not in exclude_descriptions
                                 else ""
                             ),
@@ -176,6 +281,7 @@ def collect_feeds(file_path: str = "top.csv") -> list[Article]:
                     )
 
                     source_links.add(article_link)
+                    source_titles.add(article_title)
 
     print("DONE")
     return articles
@@ -190,7 +296,7 @@ def cluster(headlines: list[str]) -> BERTopic:
 
     Returns:
         BERTopic: BERTopic model fitted on the headlines (after clustering and
-        topic generation).
+            topic generation).
     """
     cluster_model = AgglomerativeClustering(n_clusters=None, distance_threshold=1.5)
     embedding_model = SentenceTransformer("./all-MiniLM-L6-v2")
@@ -266,7 +372,7 @@ def score_clusters(articles: list[Article], topic_model: BERTopic) -> list[int]:
     # topic id -> list of article indices belonging to topic
     grouped_topics: dict[int, list[int]] = defaultdict(list)
     for article_ind, topic in enumerate(topic_model.topics_):  # type: ignore
-        grouped_topics[topic].append(article_ind)
+        grouped_topics[topic].append(article_ind)  # type: ignore
 
     scores: list[tuple[int, int]] = []  # list of (topic id, score)
     topic_id = 0
@@ -315,34 +421,34 @@ def gpt_request(
             `num_clusters`.
     """
     client = OpenAI(
-        api_key=os.environ["DEEPSEEK_API_KEY"],
+        api_key=get_env("AI_API_KEY"),
         base_url="https://api.deepseek.com",
     )
 
-    prompt_titles = [
+    headlines = [
         [article.title for article in topic_to_repr_articles[topic]]
         for topic in ranked_topics[:num_clusters]
     ]
-    prompt_keywords = [
+    keywords = [
         # get_topic returns list of tuples (keyword, c-TF-IDF score)
         [e[0] for e in topic_model.get_topic(topic)]  # type: ignore
         for topic in ranked_topics[:num_clusters]
     ]
 
-    user_prompt = """You are a helpful news aggregator service. Here's a list of lists of news headlines: %s. Each sublist represents a cluster of news headlines. In addition, here's a list of lists of keywords which describe each cluster: %s. Your task is to analyze the headlines and keywords as follows. For each cluster, perform exactly the following steps, treating each cluster independently:
-1. Based on the headlines, classify the cluster as belonging to exactly one of the following categories: U.S., World, Politics, Business, Tech, Sports, Entertainment, Science, Health.
-2. Summarize the cluster's headlines in the style of a New York Times headline. The summary must be 8 words or less.
-3. Based on the keywords and headlines, determine the news topic that each cluster is about. The topic must be 4 words or less (ex. "Russia-Ukraine War").
-4. Some headlines within the cluster might not belong to this topic. For each headline, if you are more than 90%% confident that it does not belong this topic, store this headline's index in an array called "excluded_indices". Indices start from 0.
-Provide your answer as an array of JSON objects in a single line without whitespaces, in exactly the following format: [{"category":<category>,"topic":<topic>,"summary":<summary>,"excluded_indices":<excluded_indices>},...]""" % (
-        json.dumps(prompt_titles, separators=(",", ":"), ensure_ascii=False),
-        json.dumps(prompt_keywords, separators=(",", ":"), ensure_ascii=False),
-    )
+    prompt_headlines = json.dumps(headlines, separators=(",", ":"), ensure_ascii=False)
+    prompt_keywords = json.dumps(keywords, separators=(",", ":"), ensure_ascii=False)
+
+    with open("prompt.md") as fd:
+        prompt_template = fd.read()
+        user_prompt = " ".join(prompt_template.split()).format(
+            headlines=prompt_headlines, keywords=prompt_keywords
+        )
 
     print(user_prompt)
 
     completion = client.chat.completions.create(
-        model="deepseek-chat",
+        model="deepseek-v4-flash",
+        extra_body={"thinking": {"type": "disabled"}},
         max_tokens=500,
         messages=[
             {
@@ -351,6 +457,7 @@ Provide your answer as an array of JSON objects in a single line without whitesp
             },
         ],
         response_format={"type": "json_object"},
+        stream=False,
     )
 
     print(
@@ -378,10 +485,10 @@ def prepare_transaction(
         num_articles (int): max number of articles per cluster to write to db.
 
     Returns:
-        list[dict]: List of transaction items to be written to db.
+        list[dict]: list of transaction items to be written to db.
     """
-    table_name = os.environ["TABLE_NAME"]
-    pk_timestamp, ttl_expire = generate_times()
+    table_name = get_env("AWS_DB_TABLE_NAME")
+    pk_timestamp, ttl_expire = generate_timestamps()
 
     # Exclude unrelated headlines as determined by GPT
     # topic id -> final list of articles
@@ -428,7 +535,7 @@ def prepare_transaction(
 
 def perform_transaction(transact_items: list[dict]):
     """Write items to DynamoDB."""
-    dynamodb = boto3.resource("dynamodb", region_name="us-west-1")
+    dynamodb = boto3.resource("dynamodb", region_name=get_env("AWS_DB_REGION"))
 
     try:
         dynamodb.meta.client.transact_write_items(TransactItems=transact_items)  # type: ignore
@@ -439,14 +546,19 @@ def perform_transaction(transact_items: list[dict]):
 
 
 def lambda_handler(event, context):
-    articles = collect_feeds()
-    headlines = [a.title + " " + a.description for a in articles]
-    topic_model = cluster(headlines)
-    topic_to_repr_articles = get_representative_articles(articles, topic_model, 12)
-    ranked_topics = score_clusters(articles, topic_model)
-    gpt_responses = gpt_request(topic_to_repr_articles, ranked_topics, topic_model, 8)
-    transact_items = prepare_transaction(
-        gpt_responses, topic_to_repr_articles, ranked_topics, 6
-    )
-    perform_transaction(transact_items)
-    return {"statusCode": 200, "body": [r.model_dump() for r in gpt_responses]}
+    try:
+        articles = collect_feeds()
+        headlines = [a.title + " " + a.description for a in articles]
+        topic_model = cluster(headlines)
+        topic_to_repr_articles = get_representative_articles(articles, topic_model, 12)
+        ranked_topics = score_clusters(articles, topic_model)
+        gpt_responses = gpt_request(
+            topic_to_repr_articles, ranked_topics, topic_model, 8
+        )
+        transact_items = prepare_transaction(
+            gpt_responses, topic_to_repr_articles, ranked_topics, 6
+        )
+        perform_transaction(transact_items)
+        return {"statusCode": 200, "body": [r.model_dump() for r in gpt_responses]}
+    except Exception as e:
+        return {"statusCode": 500, "body": repr(e)}

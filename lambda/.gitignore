@@ -1,5 +1,8 @@
 __pycache__/
 .venv
 .env
-src/all-MiniLM-L6-v2
 *.md
+!src/prompt.md
+src/all-MiniLM-L6-v2
+src/feeds.csv
+_*
